@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextValue {
   user: User | null;
@@ -15,29 +14,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signOutFn, setSignOutFn] = useState<() => Promise<void>>(
+    () => async () => {}
+  );
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    let unsub: (() => void) | undefined;
+    (async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      setSignOutFn(() => async () => {
+        await supabase.auth.signOut();
+      });
+
+      const { data } = supabase.auth.onAuthStateChange((_event, s) => {
+        setSession(s);
+        setUser(s?.user ?? null);
+        setLoading(false);
+      });
+      unsub = () => data.subscription.unsubscribe();
+
+      const { data: { session: s } } = await supabase.auth.getSession();
       setSession(s);
       setUser(s?.user ?? null);
       setLoading(false);
-    });
-
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    })();
+    return () => unsub?.();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signOut: signOutFn }}>
       {children}
     </AuthContext.Provider>
   );
@@ -52,4 +57,6 @@ export function useAuth() {
 const ONBOARDING_KEY = "blindguard_onboarding_complete";
 export const isOnboardingComplete = () =>
   typeof window !== "undefined" && localStorage.getItem(ONBOARDING_KEY) === "true";
-export const setOnboardingComplete = () => localStorage.setItem(ONBOARDING_KEY, "true");
+export const setOnboardingComplete = () => {
+  if (typeof window !== "undefined") localStorage.setItem(ONBOARDING_KEY, "true");
+};
