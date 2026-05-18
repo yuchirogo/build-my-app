@@ -1,0 +1,25 @@
+{
+  "name": "BlindGuard AI",
+  "short_name": "BlindGuard",
+  "description": "Hỗ trợ người khiếm thị di chuyển độc lập và an toàn",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1E3A8A",
+  "lang": "vi",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
