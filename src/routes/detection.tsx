@@ -1,19 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/app-shell";
-import { ScanEye } from "lucide-react";
+import { ClientOnly } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuth, isOnboardingComplete } from "@/hooks/use-auth";
+import { CameraView } from "@/components/camera-view";
+import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/detection")({
-  component: Detection,
+  component: DetectionPage,
 });
 
-function Detection() {
-  return (
-    <AppShell>
-      <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
-        <ScanEye className="h-16 w-16 text-primary" aria-hidden />
-        <h1 className="mt-4 text-2xl font-bold">Nhận diện vật thể</h1>
-        <p className="mt-2 text-muted-foreground">Tính năng sẽ có ở Phase 2.</p>
+function DetectionPage() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) navigate({ to: "/auth/login" });
+    else if (!isOnboardingComplete()) navigate({ to: "/onboarding" });
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
-    </AppShell>
+    );
+  }
+
+  return (
+    <ClientOnly fallback={<div className="flex min-h-screen items-center justify-center bg-black"><Loader2 className="h-8 w-8 animate-spin text-white" /></div>}>
+      <CameraView />
+    </ClientOnly>
   );
 }
