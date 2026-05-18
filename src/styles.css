@@ -140,8 +140,17 @@
     border-color: var(--color-border);
   }
 
+  html, body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  button, a {
+    min-height: 44px;
   }
 }
