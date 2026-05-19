@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useCane } from "@/hooks/use-cane";
 import { AppShell } from "@/components/app-shell";
 import { Link } from "@tanstack/react-router";
-import { ScanEye, Compass, Sparkles, Bluetooth } from "lucide-react";
+import { ScanEye, Compass, Sparkles, Bluetooth, BluetoothConnected } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -16,6 +17,7 @@ const actions = [
 
 function Dashboard() {
   const { user } = useAuth();
+  const cane = useCane();
   const name = user?.email?.split("@")[0] ?? "bạn";
 
   return (
@@ -26,15 +28,19 @@ function Dashboard() {
           <h1 className="mt-1 text-2xl font-bold">{name}</h1>
         </header>
 
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border bg-card p-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <Bluetooth className="h-5 w-5" aria-hidden />
+        <Link to="/find-cane" className="mb-6 flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:bg-accent/5">
+          <div className={`flex h-10 w-10 items-center justify-center rounded-full ${cane.connected ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
+            {cane.connected ? <BluetoothConnected className="h-5 w-5" aria-hidden /> : <Bluetooth className="h-5 w-5" aria-hidden />}
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium">Gậy thông minh</p>
-            <p className="text-xs text-muted-foreground">Chưa kết nối</p>
+            <p className="text-xs text-muted-foreground">
+              {cane.connected
+                ? `Đã kết nối${cane.telemetry?.batteryPercent != null ? ` · Pin ${cane.telemetry.batteryPercent}%` : ""}`
+                : cane.supported ? "Chưa kết nối · Bấm để ghép nối" : "Trình duyệt không hỗ trợ Bluetooth"}
+            </p>
           </div>
-        </div>
+        </Link>
 
         <h2 className="mb-3 text-base font-semibold">Hành động nhanh</h2>
         <ul className="space-y-3">
