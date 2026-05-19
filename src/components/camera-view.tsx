@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
+import { useCane } from "@/hooks/use-cane";
 import { HIGH_PRIORITY, toVietnamese } from "@/lib/detection/labels-vi";
 import { Button } from "@/components/ui/button";
 import { Camera, CameraOff, ScanLine, Volume2, VolumeX, Loader2, AlertTriangle } from "lucide-react";
@@ -23,6 +24,8 @@ export function CameraView() {
 
   const { ready: modelReady, error: modelError, detect } = useDetector(0.5);
   const { speak, speakThrottled, stop: stopTts } = useVietnameseTTS();
+  const cane = useCane();
+  const lastHapticRef = useRef(0);
 
   // Refs để vòng lặp đọc giá trị mới nhất
   const modeRef = useRef(mode);
@@ -104,6 +107,16 @@ export function CameraView() {
       const text = `${toVietnamese(d.label)} ở phía trước, khoảng cách ${dist}`;
       speakThrottled(d.label, text, { priority: HIGH_PRIORITY.has(d.label) });
     });
+    // Haptic feedback trên gậy theo mức nguy hiểm (throttle 800ms)
+    if (cane.connected && high.length > 0) {
+      const now = Date.now();
+      if (now - lastHapticRef.current > 800) {
+        const dist = estimateDistance(high[0].bbox[3], frameH);
+        const level = dist === "gần" ? 3 : dist === "trung bình" ? 2 : 1;
+        cane.haptic(level as 1 | 2 | 3).catch(() => {});
+        lastHapticRef.current = now;
+      }
+    }
   };
 
   const drawOverlay = (results: Detection[]) => {
