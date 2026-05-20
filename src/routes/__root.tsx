@@ -119,14 +119,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => { registerServiceWorker(); }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <CaneProvider>
-          <Outlet />
-          <Toaster position="top-center" />
-        </CaneProvider>
+        <SettingsProvider>
+          <CaneProvider>
+            <VoiceCommandListener />
+            <Outlet />
+            <Toaster position="top-center" />
+          </CaneProvider>
+        </SettingsProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
