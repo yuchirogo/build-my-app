@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useCane } from "@/hooks/use-cane";
 import { AppShell } from "@/components/app-shell";
+import { EmergencyButton } from "@/components/emergency-button";
 import { Link } from "@tanstack/react-router";
 import { ScanEye, Compass, Sparkles, Bluetooth, BluetoothConnected } from "lucide-react";
 
@@ -67,6 +68,10 @@ function Dashboard() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-8">
+          <EmergencyButton />
+        </div>
       </div>
     </AppShell>
   );
