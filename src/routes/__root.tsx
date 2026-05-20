@@ -9,7 +9,11 @@ import {
 } from "@tanstack/react-router";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CaneProvider } from "@/hooks/use-cane";
+import { SettingsProvider } from "@/hooks/use-settings";
+import { VoiceCommandListener } from "@/components/voice-command-listener";
 import { Toaster } from "@/components/ui/sonner";
+import { useEffect } from "react";
+import { registerServiceWorker } from "@/lib/register-sw";
 
 import appCss from "../styles.css?url";
 
