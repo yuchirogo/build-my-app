@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SceneDescriptionRouteImport } from './routes/scene-description'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -21,6 +22,11 @@ import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SceneDescriptionRoute = SceneDescriptionRouteImport.update({
   id: '/scene-description',
   path: '/scene-description',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/scene-description': typeof SceneDescriptionRoute
+  '/settings': typeof SettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/scene-description': typeof SceneDescriptionRoute
+  '/settings': typeof SettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/scene-description': typeof SceneDescriptionRoute
+  '/settings': typeof SettingsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/scene-description'
+    | '/settings'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/scene-description'
+    | '/settings'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/scene-description'
+    | '/settings'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SceneDescriptionRoute: typeof SceneDescriptionRoute
+  SettingsRoute: typeof SettingsRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scene-description': {
       id: '/scene-description'
       path: '/scene-description'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SceneDescriptionRoute: SceneDescriptionRoute,
+  SettingsRoute: SettingsRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
@@ -271,13 +292,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
