@@ -62,9 +62,12 @@ function Onboarding() {
     if (current.action === "camera") {
       setBusy(true);
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        stream.getTracks().forEach((t) => t.stop());
-        toast.success("Đã cấp quyền camera");
+        const { requestCameraPermission, requestMicrophonePermission } = await import("@/lib/native/permissions");
+        const cam = await requestCameraPermission();
+        // Xin luôn microphone để dùng cho voice command — Android sẽ hiện popup thứ 2
+        await requestMicrophonePermission();
+        if (cam === "granted") toast.success("Đã cấp quyền camera");
+        else toast.error("Bạn có thể cấp quyền sau trong cài đặt hệ thống");
       } catch {
         toast.error("Bạn có thể cấp quyền sau trong cài đặt");
       }
@@ -80,6 +83,7 @@ function Onboarding() {
         toast.error("Trình duyệt không hỗ trợ giọng nói");
       }
     }
+
 
     if (isLast) {
       setOnboardingComplete();
