@@ -20,8 +20,8 @@ function Register() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("Mật khẩu cần ít nhất 6 ký tự");
+    if (password.length < 1) {
+      toast.error("Vui lòng nhập mật khẩu");
       return;
     }
     setLoading(true);
