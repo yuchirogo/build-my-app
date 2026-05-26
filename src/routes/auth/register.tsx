@@ -70,7 +70,7 @@ function Register() {
           <div className="space-y-2">
             <Label htmlFor="password" className="text-base">Mật khẩu</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-14 text-base" autoComplete="new-password" />
-            <p className="text-xs text-muted-foreground">Ít nhất 6 ký tự</p>
+            <p className="text-xs text-muted-foreground">Nhập mật khẩu bất kỳ (ví dụ: matkhau)</p>
           </div>
           <Button type="submit" size="lg" disabled={loading} className="h-14 w-full text-base font-semibold">
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Đăng ký"}
