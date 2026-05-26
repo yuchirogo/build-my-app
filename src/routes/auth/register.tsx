@@ -20,8 +20,8 @@ function Register() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("Mật khẩu cần ít nhất 6 ký tự");
+    if (password.length < 1) {
+      toast.error("Vui lòng nhập mật khẩu");
       return;
     }
     setLoading(true);
@@ -70,7 +70,7 @@ function Register() {
           <div className="space-y-2">
             <Label htmlFor="password" className="text-base">Mật khẩu</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-14 text-base" autoComplete="new-password" />
-            <p className="text-xs text-muted-foreground">Ít nhất 6 ký tự</p>
+            <p className="text-xs text-muted-foreground">Nhập mật khẩu bất kỳ (ví dụ: matkhau)</p>
           </div>
           <Button type="submit" size="lg" disabled={loading} className="h-14 w-full text-base font-semibold">
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Đăng ký"}
