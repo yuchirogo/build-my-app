@@ -32,18 +32,34 @@ function Login() {
     navigate({ to: isOnboardingComplete() ? "/dashboard" : "/onboarding" });
   };
 
+  const isLovableHost =
+    typeof window !== "undefined" &&
+    (window.location.hostname.endsWith(".lovable.app") ||
+      window.location.hostname.endsWith(".lovable.dev"));
+
   const onGoogle = async () => {
-    setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      setLoading(false);
-      toast.error("Không thể đăng nhập với Google");
+    if (!isLovableHost) {
+      toast.error(
+        "Đăng nhập Google chỉ hoạt động trên Preview/Published (*.lovable.app). Khi chạy local hãy dùng Email/Mật khẩu."
+      );
       return;
     }
-    if (result.redirected) return;
-    navigate({ to: isOnboardingComplete() ? "/dashboard" : "/onboarding" });
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setLoading(false);
+        toast.error("Không thể đăng nhập với Google");
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: isOnboardingComplete() ? "/dashboard" : "/onboarding" });
+    } catch {
+      setLoading(false);
+      toast.error("Đăng nhập Google không khả dụng ở môi trường này");
+    }
   };
 
   return (
