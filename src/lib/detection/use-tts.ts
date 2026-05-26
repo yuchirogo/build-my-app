@@ -47,9 +47,15 @@ export function useVietnameseTTS() {
   }, []);
 
   useEffect(() => {
-    // Warm-up voices
+    // Warm-up voices (một số trình duyệt nạp voices không đồng bộ)
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.getVoices();
+      const handler = () => window.speechSynthesis.getVoices();
+      window.speechSynthesis.addEventListener?.("voiceschanged", handler);
+      return () => {
+        window.speechSynthesis.removeEventListener?.("voiceschanged", handler);
+        stop();
+      };
     }
     return () => stop();
   }, [stop]);
