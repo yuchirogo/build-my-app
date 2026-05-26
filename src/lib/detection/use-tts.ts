@@ -17,7 +17,12 @@ export function useVietnameseTTS() {
     u.rate = opts.rate ?? 1.05;
     u.volume = opts.volume ?? 1;
     const voices = window.speechSynthesis.getVoices();
-    const vi = voices.find((v) => v.lang.toLowerCase().startsWith("vi"));
+    // Ưu tiên giọng "chị Google" tiếng Việt (Google Tiếng Việt - nữ)
+    const vi =
+      voices.find((v) => /google/i.test(v.name) && /vi[-_]?vn/i.test(v.lang)) ||
+      voices.find((v) => /google/i.test(v.name) && v.lang.toLowerCase().startsWith("vi")) ||
+      voices.find((v) => /vietnam|tiếng việt|viet/i.test(v.name)) ||
+      voices.find((v) => v.lang.toLowerCase().startsWith("vi"));
     if (vi) u.voice = vi;
     if (opts.priority) window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
