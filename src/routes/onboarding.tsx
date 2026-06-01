@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useAuth, setOnboardingComplete } from "@/hooks/use-auth";
+import { useState } from "react";
+import { setOnboardingComplete } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Eye, Camera, Mic, Bluetooth, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -46,13 +46,8 @@ const steps = [
 
 function Onboarding() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth/login" });
-  }, [user, loading, navigate]);
 
   const current = steps[step];
   const Icon = current.icon;
