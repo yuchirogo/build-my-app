@@ -6,7 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useVietnameseTTS } from "@/lib/detection/use-tts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useVietnameseTTS, useVietnameseVoices } from "@/lib/detection/use-tts";
 import { Volume2 } from "lucide-react";
 
 export const Route = createFileRoute("/settings")({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/settings")({
 function SettingsPage() {
   const { settings, update } = useSettings();
   const { speak } = useVietnameseTTS();
+  const { voices, selectedURI, selectVoice } = useVietnameseVoices();
 
   return (
     <AppShell>
@@ -23,6 +25,27 @@ function SettingsPage() {
         <h1 className="text-2xl font-bold">Cài đặt</h1>
 
         <Section title="Giọng nói">
+          <Row label="Giọng đọc">
+            <Select
+              value={selectedURI ?? "__auto__"}
+              onValueChange={(v) => selectVoice(v === "__auto__" ? null : v)}
+            >
+              <SelectTrigger className="h-12 text-base" aria-label="Chọn giọng đọc">
+                <SelectValue placeholder="Tự động (chị Google)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__auto__">Tự động (ưu tiên chị Google)</SelectItem>
+                {voices.map((v) => (
+                  <SelectItem key={v.voiceURI} value={v.voiceURI}>
+                    {v.name} ({v.lang})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {voices.length === 0 && (
+              <p className="text-xs text-muted-foreground">Thiết bị chưa có giọng tiếng Việt. Hãy cài thêm trong cài đặt hệ thống.</p>
+            )}
+          </Row>
           <Row label={`Tốc độ đọc: ${settings.speechRate.toFixed(2)}x`}>
             <Slider
               value={[settings.speechRate]}
