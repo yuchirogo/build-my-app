@@ -1,17 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/use-auth";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { Settings as SettingsIcon, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
   component: Profile,
 });
 
 function Profile() {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <AppShell>
       <div className="px-6 py-8">
@@ -22,18 +18,13 @@ function Profile() {
             <UserIcon className="h-7 w-7" aria-hidden />
           </div>
           <div>
-            <p className="text-base font-semibold">{user?.email}</p>
-            <p className="text-xs text-muted-foreground">Tài khoản BlindGuard AI</p>
+            <p className="text-base font-semibold">Khách</p>
+            <p className="text-xs text-muted-foreground">Đang dùng BlindGuard AI ở chế độ không cần đăng nhập</p>
           </div>
         </div>
 
-        <Button
-          onClick={async () => { await signOut(); navigate({ to: "/auth/login" }); }}
-          variant="outline"
-          size="lg"
-          className="mt-8 h-14 w-full text-base"
-        >
-          <LogOut className="h-5 w-5" /> Đăng xuất
+        <Button asChild variant="outline" size="lg" className="mt-8 h-14 w-full text-base">
+          <Link to="/settings"><SettingsIcon className="h-5 w-5" /> Mở cài đặt</Link>
         </Button>
       </div>
     </AppShell>

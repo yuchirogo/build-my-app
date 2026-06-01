@@ -1,6 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { useAuth, isOnboardingComplete } from "@/hooks/use-auth";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { isOnboardingComplete } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Eye, Bluetooth, Mic, ShieldCheck } from "lucide-react";
 
@@ -9,14 +8,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: isOnboardingComplete() ? "/dashboard" : "/onboarding" });
-    }
-  }, [user, loading, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
@@ -42,10 +33,7 @@ function Landing() {
 
         <div className="mt-auto space-y-3">
           <Button asChild size="lg" className="h-14 w-full text-base font-semibold">
-            <Link to="/auth/register">Bắt đầu ngay</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="h-14 w-full text-base">
-            <Link to="/auth/login">Đã có tài khoản? Đăng nhập</Link>
+            <Link to={isOnboardingComplete() ? "/dashboard" : "/onboarding"}>Bắt đầu ngay</Link>
           </Button>
         </div>
       </main>
