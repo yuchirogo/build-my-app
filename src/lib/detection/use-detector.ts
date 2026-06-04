@@ -35,11 +35,10 @@ export function useDetector(minScore = 0.35, iouThreshold = 0.45): DetectorHandl
       try {
         const tf = await import("@tensorflow/tfjs");
         // Thử backend theo thứ tự: webgl (nhanh) → wasm → cpu
-        const backends = ["webgl", "wasm", "cpu"];
+        const backends = ["webgl", "cpu"];
         let chosen = "cpu";
         for (const b of backends) {
           try {
-            if (b === "wasm") await import(/* @vite-ignore */ ("@tensorflow/tfjs-backend-wasm" as string)).catch(() => null);
             await tf.setBackend(b);
             await tf.ready();
             chosen = b;
