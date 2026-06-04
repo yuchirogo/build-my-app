@@ -39,7 +39,7 @@ export function useDetector(minScore = 0.35, iouThreshold = 0.45): DetectorHandl
         let chosen = "cpu";
         for (const b of backends) {
           try {
-            if (b === "wasm") await import("@tensorflow/tfjs-backend-wasm").catch(() => null);
+            if (b === "wasm") await import(/* @vite-ignore */ ("@tensorflow/tfjs-backend-wasm" as string)).catch(() => null);
             await tf.setBackend(b);
             await tf.ready();
             chosen = b;
