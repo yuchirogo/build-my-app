@@ -21,6 +21,7 @@ export const setPreferredVoiceURI = (uri: string | null) => {
 };
 
 function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
+  if (!voices.length) return undefined;
   const preferred = getPreferredVoiceURI();
   if (preferred) {
     const found = voices.find((v) => v.voiceURI === preferred);
@@ -30,7 +31,10 @@ function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undef
     voices.find((v) => /google/i.test(v.name) && /vi[-_]?vn/i.test(v.lang)) ||
     voices.find((v) => /google/i.test(v.name) && v.lang.toLowerCase().startsWith("vi")) ||
     voices.find((v) => /vietnam|tiếng việt|viet/i.test(v.name)) ||
-    voices.find((v) => v.lang.toLowerCase().startsWith("vi"))
+    voices.find((v) => v.lang.toLowerCase().startsWith("vi")) ||
+    // Fallback: dùng giọng mặc định của hệ thống để luôn có tiếng nói
+    voices.find((v) => v.default) ||
+    voices[0]
   );
 }
 
