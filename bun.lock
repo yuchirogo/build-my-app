@@ -46,6 +46,7 @@
         "@tanstack/router-plugin": "^1.167.28",
         "@tensorflow-models/coco-ssd": "^2.2.3",
         "@tensorflow/tfjs": "^4.22.0",
+        "@tensorflow/tfjs-backend-wasm": "^4.22.0",
         "ai": "^6.0.185",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -710,6 +711,8 @@
 
     "@tensorflow/tfjs-backend-cpu": ["@tensorflow/tfjs-backend-cpu@4.22.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-4.22.0.tgz", { "dependencies": { "@types/seedrandom": "^2.4.28", "seedrandom": "^3.0.5" }, "peerDependencies": { "@tensorflow/tfjs-core": "4.22.0" } }, "sha512-1u0FmuLGuRAi8D2c3cocHTASGXOmHc/4OvoVDENJayjYkS119fcTcQf4iHrtLthWyDIPy3JiPhRrZQC9EwnhLw=="],
 
+    "@tensorflow/tfjs-backend-wasm": ["@tensorflow/tfjs-backend-wasm@4.22.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tensorflow/tfjs-backend-wasm/-/tfjs-backend-wasm-4.22.0.tgz", { "dependencies": { "@tensorflow/tfjs-backend-cpu": "4.22.0", "@types/emscripten": "~0.0.34" }, "peerDependencies": { "@tensorflow/tfjs-core": "4.22.0" } }, "sha512-/IYhReRIp4jg/wYW0OwbbJZG8ON87mbz0PgkiP3CdcACRSvUN0h8rvC0O3YcDtkTQtFWF/tcXq/KlVDyV49wmA=="],
+
     "@tensorflow/tfjs-backend-webgl": ["@tensorflow/tfjs-backend-webgl@4.22.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tensorflow/tfjs-backend-webgl/-/tfjs-backend-webgl-4.22.0.tgz", { "dependencies": { "@tensorflow/tfjs-backend-cpu": "4.22.0", "@types/offscreencanvas": "~2019.3.0", "@types/seedrandom": "^2.4.28", "seedrandom": "^3.0.5" }, "peerDependencies": { "@tensorflow/tfjs-core": "4.22.0" } }, "sha512-H535XtZWnWgNwSzv538czjVlbJebDl5QTMOth4RXr2p/kJ1qSIXE0vZvEtO+5EC9b00SvhplECny2yDewQb/Yg=="],
 
     "@tensorflow/tfjs-converter": ["@tensorflow/tfjs-converter@4.22.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tensorflow/tfjs-converter/-/tfjs-converter-4.22.0.tgz", { "peerDependencies": { "@tensorflow/tfjs-core": "4.22.0" } }, "sha512-PT43MGlnzIo+YfbsjM79Lxk9lOq6uUwZuCc8rrp0hfpLjF6Jv8jS84u2jFb+WpUeuF4K33ZDNx8CjiYrGQ2trQ=="],
@@ -761,6 +764,8 @@
     "@types/d3-timer": ["@types/d3-timer@3.0.2", "", {}, "sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw=="],
 
     "@types/deep-eql": ["@types/deep-eql@4.0.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@types/deep-eql/-/deep-eql-4.0.2.tgz", {}, "sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw=="],
+
+    "@types/emscripten": ["@types/emscripten@0.0.34", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@types/emscripten/-/emscripten-0.0.34.tgz", {}, "sha512-QSb9ojDincskc+uKMI0KXp8e1NALFINCrMlp8VGKGcTSxeEyRTTKyjWw75NYrCZHUsVEEEpr1tYHpbtaC++/sQ=="],
 
     "@types/estree": ["@types/estree@1.0.8", "", {}, "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="],
 
