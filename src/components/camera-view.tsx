@@ -67,7 +67,12 @@ export function CameraView() {
     stopTts();
   };
 
-  useEffect(() => () => stopCamera(), []); // cleanup on unmount
+  // Tự động xin quyền & bật camera ngay khi vào trang để hộp thoại "Cho phép camera" hiện lập tức
+  useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Detections mới nhất (ref) để render loop đọc mà không re-render
   const latestDetRef = useRef<Detection[]>([]);
