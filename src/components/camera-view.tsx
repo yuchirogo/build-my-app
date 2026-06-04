@@ -37,7 +37,12 @@ export function CameraView() {
     setCamError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 60, min: 30 },
+        },
         audio: false,
       });
       streamRef.current = stream;
@@ -64,35 +69,60 @@ export function CameraView() {
 
   useEffect(() => () => stopCamera(), []); // cleanup on unmount
 
-  // Vòng lặp inference
+  // Detections mới nhất (ref) để render loop đọc mà không re-render
+  const latestDetRef = useRef<Detection[]>([]);
+
+  // === Render loop: vẽ overlay ở tốc độ tối đa của màn hình (~60fps) ===
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    let frames = 0;
+    let lastFpsTs = performance.now();
+    const render = () => {
+      drawOverlay(latestDetRef.current);
+      frames++;
+      const now = performance.now();
+      if (now - lastFpsTs >= 500) {
+        setFps(Math.round((frames * 1000) / (now - lastFpsTs)));
+        frames = 0;
+        lastFpsTs = now;
+      }
+      raf = requestAnimationFrame(render);
+    };
+    raf = requestAnimationFrame(render);
+    rafRef.current = raf;
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+
+  // === Inference loop: chạy độc lập, lặp ngay khi xong (không block render) ===
   useEffect(() => {
     if (!active || !modelReady) return;
-    let lastTs = performance.now();
-    let frame = 0;
-
-    const loop = async () => {
-      const video = videoRef.current;
-      if (!video) return;
-      frame++;
-      // Inference mỗi 3 frame để đỡ tốn GPU
-      let results: Detection[] = detections;
-      if (frame % 3 === 0) {
-        results = await detect(video);
-        setDetections(results);
-        if (modeRef.current === "realtime" && !mutedRef.current) {
-          announce(results, video.videoHeight);
+    let cancelled = false;
+    const run = async () => {
+      while (!cancelled) {
+        const video = videoRef.current;
+        if (!video || video.readyState < 2) {
+          await new Promise((r) => setTimeout(r, 50));
+          continue;
         }
-        const now = performance.now();
-        setFps(Math.round(1000 / Math.max(1, now - lastTs)));
-        lastTs = now;
+        try {
+          const results = await detect(video);
+          if (cancelled) break;
+          latestDetRef.current = results;
+          setDetections(results);
+          if (modeRef.current === "realtime" && !mutedRef.current) {
+            announce(results, video.videoHeight);
+          }
+        } catch {
+          /* bỏ qua frame lỗi */
+        }
+        // Nhường thread để UI/camera mượt
+        await new Promise((r) => setTimeout(r, 0));
       }
-      drawOverlay(results);
-      rafRef.current = requestAnimationFrame(loop);
     };
-
-    rafRef.current = requestAnimationFrame(loop);
+    run();
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, modelReady]);
