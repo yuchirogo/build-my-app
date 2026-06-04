@@ -31,19 +31,22 @@ function SettingsPage() {
               onValueChange={(v) => selectVoice(v === "__auto__" ? null : v)}
             >
               <SelectTrigger className="h-12 text-base" aria-label="Chọn giọng đọc">
-                <SelectValue placeholder="Tự động (chị Google)" />
+                <SelectValue placeholder="Tự động" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__auto__">Tự động (ưu tiên chị Google)</SelectItem>
-                {voices.map((v) => (
-                  <SelectItem key={v.voiceURI} value={v.voiceURI}>
-                    {v.name} ({v.lang})
-                  </SelectItem>
-                ))}
+                <SelectItem value="__auto__">Tự động (giọng hệ thống)</SelectItem>
+                {voices.map((v) => {
+                  const isVi = v.lang.toLowerCase().startsWith("vi");
+                  return (
+                    <SelectItem key={v.voiceURI} value={v.voiceURI}>
+                      {isVi ? "🇻🇳 " : ""}{v.name} ({v.lang}){v.default ? " · mặc định" : ""}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             {voices.length === 0 && (
-              <p className="text-xs text-muted-foreground">Thiết bị chưa có giọng tiếng Việt. Hãy cài thêm trong cài đặt hệ thống.</p>
+              <p className="text-xs text-muted-foreground">Đang tải giọng nói từ hệ thống…</p>
             )}
           </Row>
           <Row label={`Tốc độ đọc: ${settings.speechRate.toFixed(2)}x`}>
