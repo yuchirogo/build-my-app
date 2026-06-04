@@ -87,7 +87,7 @@ export function useVietnameseTTS() {
   return { speak, speakThrottled, stop };
 }
 
-/** Hook trả về danh sách giọng tiếng Việt và giọng đang chọn. */
+/** Hook trả về toàn bộ giọng nói có sẵn trên hệ thống (ưu tiên tiếng Việt lên đầu) và giọng đang chọn. */
 export function useVietnameseVoices() {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedURI, setSelectedURI] = useState<string | null>(() => getPreferredVoiceURI());
@@ -96,8 +96,15 @@ export function useVietnameseVoices() {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     const load = () => {
       const all = window.speechSynthesis.getVoices();
-      const vi = all.filter((v) => v.lang.toLowerCase().startsWith("vi") || /vietnam|tiếng việt|viet/i.test(v.name));
-      setVoices(vi);
+      const isVi = (v: SpeechSynthesisVoice) =>
+        v.lang.toLowerCase().startsWith("vi") || /vietnam|tiếng việt|viet/i.test(v.name);
+      const sorted = [...all].sort((a, b) => {
+        const av = isVi(a) ? 0 : 1;
+        const bv = isVi(b) ? 0 : 1;
+        if (av !== bv) return av - bv;
+        return a.name.localeCompare(b.name);
+      });
+      setVoices(sorted);
     };
     load();
     window.speechSynthesis.addEventListener?.("voiceschanged", load);
