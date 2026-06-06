@@ -47,20 +47,17 @@ function Onboarding() {
   const isLast = step === steps.length - 1;
 
   const handlePrimary = async () => {
-    if (current.action === "camera") {
-      setBusy(true);
+    if (current.action === "voice") {
       try {
-        const { requestCameraPermission, requestMicrophonePermission } = await import("@/lib/native/permissions");
-        const cam = await requestCameraPermission();
-        // Xin luôn microphone để dùng cho voice command — Android sẽ hiện popup thứ 2
-        await requestMicrophonePermission();
-        if (cam === "granted") toast.success("Đã cấp quyền camera");
-        else toast.error("Bạn có thể cấp quyền sau trong cài đặt hệ thống");
+        const u = new SpeechSynthesisUtterance(
+          "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
+        );
+        u.lang = "vi-VN";
+        speechSynthesis.speak(u);
       } catch {
-        toast.error("Bạn có thể cấp quyền sau trong cài đặt");
+        toast.error("Trình duyệt không hỗ trợ giọng nói");
       }
-      setBusy(false);
-    } else if (current.action === "voice") {
+    }
       try {
         const u = new SpeechSynthesisUtterance(
           "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
