@@ -40,17 +40,13 @@ function Onboarding() {
   const isLast = step === steps.length - 1;
 
   const handlePrimary = async () => {
-    if (current.action === "voice") {
-      try {
-        const u = new SpeechSynthesisUtterance(
-          "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
-        );
-        u.lang = "vi-VN";
-        speechSynthesis.speak(u);
-      } catch {
-        toast.error("Trình duyệt không hỗ trợ giọng nói");
-      }
+    if (isLast) {
+      setOnboardingComplete();
+      navigate({ to: "/dashboard" });
+    } else {
+      setStep((s) => s + 1);
     }
+  };
 
 
     if (isLast) {
