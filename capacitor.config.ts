@@ -12,7 +12,8 @@ const config: CapacitorConfig = {
   },
   plugins: {
     Camera: {
-      // Plugin tự xin quyền CAMERA khi gọi getPhoto / requestPermissions
+      // Khai báo loại quyền để Android hiển thị popup runtime đúng cách
+      permissionType: "camera",
     },
     BluetoothLe: {
       displayStrings: {
