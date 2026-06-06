@@ -17,13 +17,6 @@ const steps = [
     cta: "Tiếp tục",
   },
   {
-    icon: Camera,
-    title: "Cho phép Camera",
-    desc: "BlindGuard AI cần camera để nhận diện vật thể và môi trường xung quanh.",
-    cta: "Cấp quyền Camera",
-    action: "camera" as const,
-  },
-  {
     icon: Mic,
     title: "Cấu hình giọng nói",
     desc: "Chúng tôi sẽ thông báo bằng giọng nói tiếng Việt rõ ràng và tự nhiên.",
