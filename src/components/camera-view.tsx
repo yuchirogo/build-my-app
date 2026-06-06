@@ -237,7 +237,7 @@ export function CameraView() {
           </div>
         )}
 
-        {camError && (
+        {false && camError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
             <AlertTriangle className="h-12 w-12 text-secondary" aria-hidden />
             <p className="text-base">{camError}</p>
