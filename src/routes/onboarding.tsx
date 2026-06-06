@@ -58,16 +58,6 @@ function Onboarding() {
         toast.error("Trình duyệt không hỗ trợ giọng nói");
       }
     }
-      try {
-        const u = new SpeechSynthesisUtterance(
-          "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
-        );
-        u.lang = "vi-VN";
-        speechSynthesis.speak(u);
-      } catch {
-        toast.error("Trình duyệt không hỗ trợ giọng nói");
-      }
-    }
 
 
     if (isLast) {
