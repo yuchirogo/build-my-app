@@ -74,10 +74,29 @@ export async function requestMicrophonePermission(): Promise<PermResult> {
   }
 }
 
-/** Gọi tuần tự nhiều quyền — Android sẽ hiện từng popup như trong mockup. */
+/** Tự động xin Camera + Microphone (+ Bluetooth nếu native) ngay khi app khởi động. */
 export async function requestAllPermissions(): Promise<Record<string, PermResult>> {
-  const camera = await requestCameraPermission();
-  const microphone = await requestMicrophonePermission();
-  const bluetooth = await requestBluetoothPermission();
-  return { camera, microphone, bluetooth };
+  const results: Record<string, PermResult> = {};
+  if (isNative()) {
+    try {
+      const { Camera } = await import("@capacitor/camera");
+      const camRes = await Camera.requestPermissions({ permissions: ["camera"] });
+      results.camera = camRes.camera === "granted" ? "granted" : "denied";
+    } catch {
+      results.camera = "denied";
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+      results.microphone = "granted";
+    } catch {
+      results.microphone = "denied";
+    }
+    results.bluetooth = await requestBluetoothPermission();
+  } else {
+    results.camera = await requestCameraPermission();
+    results.microphone = await requestMicrophonePermission();
+    results.bluetooth = "prompt";
+  }
+  return results;
 }

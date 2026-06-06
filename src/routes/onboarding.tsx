@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { setOnboardingComplete } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Eye, Camera, Mic, Bluetooth, Sparkles, Loader2, ArrowRight } from "lucide-react";
+import { Eye, Mic, Bluetooth, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/onboarding")({
@@ -15,13 +15,6 @@ const steps = [
     title: "Chào mừng đến BlindGuard AI",
     desc: "Trợ thủ AI giúp bạn di chuyển độc lập và an toàn mỗi ngày.",
     cta: "Tiếp tục",
-  },
-  {
-    icon: Camera,
-    title: "Cho phép Camera",
-    desc: "BlindGuard AI cần camera để nhận diện vật thể và môi trường xung quanh.",
-    cta: "Cấp quyền Camera",
-    action: "camera" as const,
   },
   {
     icon: Mic,
@@ -54,20 +47,7 @@ function Onboarding() {
   const isLast = step === steps.length - 1;
 
   const handlePrimary = async () => {
-    if (current.action === "camera") {
-      setBusy(true);
-      try {
-        const { requestCameraPermission, requestMicrophonePermission } = await import("@/lib/native/permissions");
-        const cam = await requestCameraPermission();
-        // Xin luôn microphone để dùng cho voice command — Android sẽ hiện popup thứ 2
-        await requestMicrophonePermission();
-        if (cam === "granted") toast.success("Đã cấp quyền camera");
-        else toast.error("Bạn có thể cấp quyền sau trong cài đặt hệ thống");
-      } catch {
-        toast.error("Bạn có thể cấp quyền sau trong cài đặt");
-      }
-      setBusy(false);
-    } else if (current.action === "voice") {
+    if (current.action === "voice") {
       try {
         const u = new SpeechSynthesisUtterance(
           "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
