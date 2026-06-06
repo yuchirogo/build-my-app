@@ -17,13 +17,6 @@ const steps = [
     cta: "Tiếp tục",
   },
   {
-    icon: Mic,
-    title: "Cấu hình giọng nói",
-    desc: "Chúng tôi sẽ thông báo bằng giọng nói tiếng Việt rõ ràng và tự nhiên.",
-    cta: "Nghe thử giọng nói",
-    action: "voice" as const,
-  },
-  {
     icon: Bluetooth,
     title: "Ghép nối gậy thông minh",
     desc: "Kết nối với gậy ESP32 qua Bluetooth. Bạn có thể bỏ qua và làm sau.",
