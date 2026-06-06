@@ -91,7 +91,7 @@ function Onboarding() {
               </span>
             )}
           </Button>
-          {!isLast && current.action && (
+          {!isLast && (
             <Button onClick={handleSkip} variant="ghost" size="lg" className="h-12 w-full">
               Bỏ qua bước này
             </Button>
