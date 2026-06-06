@@ -49,14 +49,6 @@ function Onboarding() {
   };
 
 
-    if (isLast) {
-      setOnboardingComplete();
-      navigate({ to: "/dashboard" });
-    } else {
-      setStep((s) => s + 1);
-    }
-  };
-
   const handleSkip = () => {
     if (isLast) return;
     setStep((s) => s + 1);
