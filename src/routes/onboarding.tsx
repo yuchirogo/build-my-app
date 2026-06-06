@@ -17,13 +17,6 @@ const steps = [
     cta: "Tiếp tục",
   },
   {
-    icon: Mic,
-    title: "Cấu hình giọng nói",
-    desc: "Chúng tôi sẽ thông báo bằng giọng nói tiếng Việt rõ ràng và tự nhiên.",
-    cta: "Nghe thử giọng nói",
-    action: "voice" as const,
-  },
-  {
     icon: Bluetooth,
     title: "Ghép nối gậy thông minh",
     desc: "Kết nối với gậy ESP32 qua Bluetooth. Bạn có thể bỏ qua và làm sau.",
@@ -47,19 +40,6 @@ function Onboarding() {
   const isLast = step === steps.length - 1;
 
   const handlePrimary = async () => {
-    if (current.action === "voice") {
-      try {
-        const u = new SpeechSynthesisUtterance(
-          "Xin chào, tôi là BlindGuard AI, trợ lý đồng hành của bạn."
-        );
-        u.lang = "vi-VN";
-        speechSynthesis.speak(u);
-      } catch {
-        toast.error("Trình duyệt không hỗ trợ giọng nói");
-      }
-    }
-
-
     if (isLast) {
       setOnboardingComplete();
       navigate({ to: "/dashboard" });
@@ -67,6 +47,7 @@ function Onboarding() {
       setStep((s) => s + 1);
     }
   };
+
 
   const handleSkip = () => {
     if (isLast) return;
@@ -110,7 +91,7 @@ function Onboarding() {
               </span>
             )}
           </Button>
-          {!isLast && current.action && (
+          {!isLast && (
             <Button onClick={handleSkip} variant="ghost" size="lg" className="h-12 w-full">
               Bỏ qua bước này
             </Button>
