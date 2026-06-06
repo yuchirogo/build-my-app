@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { setOnboardingComplete } from "@/hooks/use-auth";
+import { ArrowRight, Bluetooth, Eye, Sparkles } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Eye, Mic, Bluetooth, Sparkles, Loader2, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+import { setOnboardingComplete } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/onboarding")({
   component: Onboarding,
@@ -20,7 +20,7 @@ const steps = [
     icon: Bluetooth,
     title: "Ghép nối gậy thông minh",
     desc: "Kết nối với gậy ESP32 qua Bluetooth. Bạn có thể bỏ qua và làm sau.",
-    cta: "Bỏ qua bước này",
+    cta: "Tiếp tục",
   },
   {
     icon: Sparkles,
@@ -28,48 +28,65 @@ const steps = [
     desc: "Bạn đã hoàn tất thiết lập. Hãy bắt đầu khám phá BlindGuard AI.",
     cta: "Bắt đầu sử dụng",
   },
-];
+] as const;
 
 function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [busy, setBusy] = useState(false);
 
   const current = steps[step];
   const Icon = current.icon;
   const isLast = step === steps.length - 1;
 
-  const handlePrimary = async () => {
-    if (isLast) {
-      setOnboardingComplete();
-      navigate({ to: "/dashboard" });
-    } else {
-      setStep((s) => s + 1);
-    }
+  const completeOnboarding = () => {
+    setOnboardingComplete();
+    navigate({ to: "/dashboard" });
   };
 
+  const handlePrimary = () => {
+    if (isLast) {
+      completeOnboarding();
+      return;
+    }
+
+    setStep((value) => value + 1);
+  };
 
   const handleSkip = () => {
-    if (isLast) return;
-    setStep((s) => s + 1);
+    if (isLast) {
+      return;
+    }
+
+    setStep((value) => value + 1);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto flex min-h-screen max-w-md flex-col px-6 py-8">
         <div className="flex items-center justify-between">
-          <div className="flex gap-1.5" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={steps.length}>
-            {steps.map((_, i) => (
+          <div
+            className="flex gap-1.5"
+            role="progressbar"
+            aria-valuenow={step + 1}
+            aria-valuemin={1}
+            aria-valuemax={steps.length}
+          >
+            {steps.map((_, index) => (
               <div
-                key={i}
+                key={index}
                 className={`h-1.5 w-8 rounded-full transition-colors ${
-                  i <= step ? "bg-primary" : "bg-muted"
+                  index <= step ? "bg-primary" : "bg-muted"
                 }`}
               />
             ))}
           </div>
+
           {!isLast && (
-            <button onClick={() => { setOnboardingComplete(); navigate({ to: "/dashboard" }); }} className="text-sm font-medium text-muted-foreground">
+            <button
+              type="button"
+              onClick={completeOnboarding}
+              className="text-sm font-medium text-muted-foreground"
+            >
               Bỏ qua
             </button>
           )}
@@ -79,18 +96,23 @@ function Onboarding() {
           <div className="mb-8 flex h-28 w-28 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Icon className="h-14 w-14" aria-hidden />
           </div>
+
           <h1 className="text-2xl font-bold text-foreground">{current.title}</h1>
           <p className="mt-4 max-w-sm text-base text-muted-foreground">{current.desc}</p>
         </div>
 
         <div className="space-y-3">
-          <Button onClick={handlePrimary} disabled={busy} size="lg" className="h-14 w-full text-base font-semibold">
-            {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : (
-              <span className="inline-flex items-center gap-2">
-                {current.cta} <ArrowRight className="h-5 w-5" aria-hidden />
-              </span>
-            )}
+          <Button
+            onClick={handlePrimary}
+            size="lg"
+            className="h-14 w-full text-base font-semibold"
+          >
+            <span className="inline-flex items-center gap-2">
+              {current.cta}
+              <ArrowRight className="h-5 w-5" aria-hidden />
+            </span>
           </Button>
+
           {!isLast && (
             <Button onClick={handleSkip} variant="ghost" size="lg" className="h-12 w-full">
               Bỏ qua bước này
