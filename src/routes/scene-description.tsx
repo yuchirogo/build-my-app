@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { describeScene } from "@/lib/scene/describe.functions";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
+import { requestCameraPermission } from "@/lib/native/permissions";
 import { useSettings } from "@/hooks/use-settings";
 import { Camera, Sparkles, Loader2, AlertTriangle, CameraOff } from "lucide-react";
 import { toast } from "sonner";
@@ -40,6 +41,11 @@ function Scene() {
   const start = async () => {
     setError(null);
     try {
+      const perm = await requestCameraPermission();
+      if (perm === "denied") {
+        setError("Vui lòng cấp quyền camera trong cài đặt để sử dụng tính năng này.");
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,

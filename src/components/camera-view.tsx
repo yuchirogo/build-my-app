@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { requestCameraPermission } from "@/lib/native/permissions";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
@@ -36,6 +37,12 @@ export function CameraView() {
   const startCamera = async () => {
     setCamError(null);
     try {
+      // Xin quyền camera native trước (Capacitor) để popup Android hiện ra
+      const perm = await requestCameraPermission();
+      if (perm === "denied") {
+        setCamError("Vui lòng cấp quyền camera trong cài đặt để sử dụng tính năng này.");
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: "environment" },
