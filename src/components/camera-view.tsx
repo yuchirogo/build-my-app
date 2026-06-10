@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { requestCameraPermission } from "@/lib/native/permissions";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
