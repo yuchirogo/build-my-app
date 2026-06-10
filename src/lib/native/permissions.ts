@@ -18,8 +18,13 @@ export async function requestCameraPermission(): Promise<PermResult> {
   if (isNative()) {
     try {
       const { Camera } = await import("@capacitor/camera");
-      const res = await Camera.requestPermissions({ permissions: ["camera"] });
-      return res.camera === "granted" ? "granted" : "denied";
+      // Bước 1: check trước
+      let perm = await Camera.checkPermissions();
+      // Bước 2: nếu chưa granted thì request (popup native)
+      if (perm.camera !== "granted") {
+        perm = await Camera.requestPermissions({ permissions: ["camera"] });
+      }
+      return perm.camera === "granted" ? "granted" : "denied";
     } catch (e) {
       console.warn("Camera permission error", e);
       return "denied";
