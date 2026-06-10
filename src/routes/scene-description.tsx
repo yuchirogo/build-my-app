@@ -41,6 +41,11 @@ function Scene() {
   const start = async () => {
     setError(null);
     try {
+      const perm = await requestCameraPermission();
+      if (perm === "denied") {
+        setError("Vui lòng cấp quyền camera trong cài đặt để sử dụng tính năng này.");
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
