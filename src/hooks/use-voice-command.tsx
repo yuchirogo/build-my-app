@@ -66,10 +66,20 @@ export function useVoiceCommand({ enabled, commands, onTranscript }: Options) {
       console.warn("SpeechRecognition error", e.error);
     };
 
-    try {
-      rec.start();
-      setListening(true);
-    } catch {}
+    let cancelled = false;
+    (async () => {
+      // Xin quyền RECORD_AUDIO trước khi gọi SpeechRecognition (popup native trên Android)
+      const perm = await requestMicrophonePermission();
+      if (cancelled) return;
+      if (perm !== "granted") {
+        console.warn("Microphone permission not granted, voice command disabled");
+        return;
+      }
+      try {
+        rec.start();
+        setListening(true);
+      } catch {}
+    })();
 
     return () => {
       try { rec.onend = null; rec.stop(); } catch {}
