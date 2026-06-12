@@ -62,7 +62,8 @@ export async function requestMicrophonePermission(): Promise<PermResult> {
   if (isNative()) {
     // Ưu tiên dùng plugin SpeechRecognition nếu có (xin RECORD_AUDIO native)
     try {
-      const mod: any = await import(/* @vite-ignore */ "@capacitor-community/speech-recognition").catch(() => null);
+      const pkg = "@capacitor-community/speech-recognition";
+      const mod: any = await import(/* @vite-ignore */ pkg).catch(() => null);
       if (mod?.SpeechRecognition) {
         const SR = mod.SpeechRecognition;
         const check = await SR.checkPermissions?.();
