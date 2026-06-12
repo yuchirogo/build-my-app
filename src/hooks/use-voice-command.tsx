@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { requestMicrophonePermission } from "@/lib/native/permissions";
 
 export interface VoiceCommand {
   match: RegExp;
@@ -65,12 +66,23 @@ export function useVoiceCommand({ enabled, commands, onTranscript }: Options) {
       console.warn("SpeechRecognition error", e.error);
     };
 
-    try {
-      rec.start();
-      setListening(true);
-    } catch {}
+    let cancelled = false;
+    (async () => {
+      // Xin quyền RECORD_AUDIO trước khi gọi SpeechRecognition (popup native trên Android)
+      const perm = await requestMicrophonePermission();
+      if (cancelled) return;
+      if (perm !== "granted") {
+        console.warn("Microphone permission not granted, voice command disabled");
+        return;
+      }
+      try {
+        rec.start();
+        setListening(true);
+      } catch {}
+    })();
 
     return () => {
+      cancelled = true;
       try { rec.onend = null; rec.stop(); } catch {}
       setListening(false);
     };
