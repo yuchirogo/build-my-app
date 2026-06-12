@@ -85,6 +85,46 @@ Mở app trên Android → bấm onboarding bước "Cho phép Camera" → sẽ 
 
 Tiếp theo là popup microphone, rồi khi vào màn "Tìm gậy" sẽ hiện popup Bluetooth scan/connect. Đúng như mockup bạn gửi.
 
+### 6.1 Verify quyền RECORD_AUDIO trong manifest
+
+Sau mỗi lần `bunx cap sync android` (đặc biệt khi cập nhật plugin hoặc đổi `capacitor.config.ts`), chạy các bước sau để chắc chắn `RECORD_AUDIO` không bị mất:
+
+**a) Manifest nguồn** (do bạn chỉnh tay ở mục 4):
+```bash
+grep -n "RECORD_AUDIO" android/app/src/main/AndroidManifest.xml
+```
+Phải in ra đúng 1 dòng:
+```
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+```
+Nếu trống → mở file và thêm lại (cap sync **không** tự thêm quyền này).
+
+**b) Merged manifest** (sản phẩm cuối Gradle dùng để đóng gói APK) — sinh ra sau khi build:
+```bash
+cd android && ./gradlew processDebugManifest
+grep -n "RECORD_AUDIO" app/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+```
+Phải thấy `RECORD_AUDIO`. Nếu thiếu → có plugin/library override; kiểm tra `app/build/outputs/logs/manifest-merger-debug-report.txt`.
+
+**c) Verify APK đã build** (đảm bảo quyền thực sự nằm trong APK cài lên máy):
+```bash
+# Cần Android SDK build-tools trong PATH
+aapt dump permissions app/build/outputs/apk/debug/app-debug.apk | grep RECORD_AUDIO
+```
+Kết quả mong đợi:
+```
+uses-permission: name='android.permission.RECORD_AUDIO'
+```
+
+**d) Verify trên thiết bị** sau khi `adb install`:
+```bash
+adb shell dumpsys package ai.blindguard.app | grep RECORD_AUDIO
+```
+Phải có `android.permission.RECORD_AUDIO: granted=true` (sau khi user bấm Cho phép) hoặc `granted=false` (trước khi xin).
+
+Gợi ý: bỏ 4 lệnh này vào script `scripts/verify-permissions.sh` chạy ngay sau `cap sync` trong CI để fail-fast nếu manifest bị regress.
+
+
 ## 7. Build APK release (ký số)
 
 ```bash
