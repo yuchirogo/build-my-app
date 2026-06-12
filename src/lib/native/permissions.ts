@@ -57,11 +57,25 @@ export async function requestBluetoothPermission(): Promise<PermResult> {
   return typeof navigator !== "undefined" && (navigator as any).bluetooth ? "prompt" : "unsupported";
 }
 
-/** Xin quyền microphone (cho voice command). */
+/** Xin quyền microphone (RECORD_AUDIO). Trên Android sẽ bật popup hệ thống. */
 export async function requestMicrophonePermission(): Promise<PermResult> {
   if (isNative()) {
-    // Plugin SpeechRecognition của Capacitor xin quyền RECORD_AUDIO khi gọi start().
-    // Ở đây thử getUserMedia (Capacitor WebView cũng trigger popup native).
+    // Ưu tiên dùng plugin SpeechRecognition nếu có (xin RECORD_AUDIO native)
+    try {
+      const mod: any = await import("@capacitor-community/speech-recognition").catch(() => null);
+      if (mod?.SpeechRecognition) {
+        const SR = mod.SpeechRecognition;
+        const check = await SR.checkPermissions?.();
+        const status = check?.speechRecognition ?? check?.record_audio;
+        if (status === "granted") return "granted";
+        const req = await SR.requestPermissions?.();
+        const after = req?.speechRecognition ?? req?.record_audio;
+        if (after === "granted") return "granted";
+      }
+    } catch (e) {
+      console.warn("SpeechRecognition permission error", e);
+    }
+    // Fallback: getUserMedia trên Capacitor WebView cũng kích hoạt popup RECORD_AUDIO
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((t) => t.stop());
