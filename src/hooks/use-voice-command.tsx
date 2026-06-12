@@ -82,6 +82,7 @@ export function useVoiceCommand({ enabled, commands, onTranscript }: Options) {
     })();
 
     return () => {
+      cancelled = true;
       try { rec.onend = null; rec.stop(); } catch {}
       setListening(false);
     };
