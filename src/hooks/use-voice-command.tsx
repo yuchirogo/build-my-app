@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { requestMicrophonePermission } from "@/lib/native/permissions";
 
 export interface VoiceCommand {
   match: RegExp;
