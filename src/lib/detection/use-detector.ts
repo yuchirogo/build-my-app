@@ -153,7 +153,7 @@ export function useDetector(minScore = 0.35, iouThreshold = 0.45): DetectorHandl
       });
     }
 
-    return nms(candidates, iouThreshold).slice(0, 20);
+    return nms(candidates, iouThreshold).slice(0, 3);
   };
 
   return { ready, error, detect };
