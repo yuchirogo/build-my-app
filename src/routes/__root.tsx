@@ -14,6 +14,7 @@ import { VoiceCommandListener } from "@/components/voice-command-listener";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect } from "react";
 import { registerServiceWorker } from "@/lib/register-sw";
+import { installTtsUnlockListeners } from "@/lib/tts/unlock";
 
 import appCss from "../styles.css?url";
 
@@ -119,7 +120,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  useEffect(() => { registerServiceWorker(); }, []);
+  useEffect(() => {
+    registerServiceWorker();
+    installTtsUnlockListeners();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { unlockTts } from "@/lib/tts/unlock";
 
 interface SpeakOpts {
   rate?: number;
@@ -44,15 +45,27 @@ export function useVietnameseTTS() {
 
   const speak = useCallback((text: string, opts: SpeakOpts = {}) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    // Một số trình duyệt rơi vào trạng thái paused sau khi tab ẩn / mất focus
+    try { window.speechSynthesis.resume(); } catch {}
+    // Đảm bảo engine đã được mở khóa (no-op nếu chưa có user gesture)
+    unlockTts();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "vi-VN";
     u.rate = opts.rate ?? 1.05;
     u.volume = opts.volume ?? 1;
     const voice = pickVoice(window.speechSynthesis.getVoices());
     if (voice) u.voice = voice;
-    if (opts.priority) window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+    if (opts.priority) {
+      try { window.speechSynthesis.cancel(); } catch {}
+      // Chờ 1 tick để cancel hoàn tất, tránh race khiến speak() bị nuốt
+      setTimeout(() => {
+        try { window.speechSynthesis.speak(u); } catch {}
+      }, 30);
+      return;
+    }
+    try { window.speechSynthesis.speak(u); } catch {}
   }, []);
+
 
   const speakThrottled = useCallback(
     (key: string, text: string, opts?: SpeakOpts) => {
