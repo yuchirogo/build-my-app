@@ -44,14 +44,18 @@ export function useVietnameseTTS() {
 
   const speak = useCallback((text: string, opts: SpeakOpts = {}) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (!text) return;
+    const synth = window.speechSynthesis;
+    // Một số trình duyệt (Chrome Android) pause engine khi idle — phải resume trước khi speak.
+    try { synth.resume(); } catch {}
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "vi-VN";
     u.rate = opts.rate ?? 1.05;
     u.volume = opts.volume ?? 1;
-    const voice = pickVoice(window.speechSynthesis.getVoices());
+    const voice = pickVoice(synth.getVoices());
     if (voice) u.voice = voice;
-    if (opts.priority) window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+    if (opts.priority) synth.cancel();
+    synth.speak(u);
   }, []);
 
   const speakThrottled = useCallback(
