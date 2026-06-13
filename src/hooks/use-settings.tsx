@@ -14,7 +14,7 @@ const DEFAULTS: Settings = {
   speechRate: 1.05,
   volume: 1,
   hapticEnabled: true,
-  voiceCommandEnabled: false,
+  voiceCommandEnabled: true,
   emergencyName: "",
   emergencyPhone: "",
   offlineMode: false,
