@@ -41,18 +41,21 @@ function Scene() {
   const start = async () => {
     setError(null);
     try {
-      const perm = await requestCameraPermission();
-      if (perm === "denied") {
-        setError("Vui lòng cấp quyền camera trong cài đặt để sử dụng tính năng này.");
-        return;
+      let result;
+      try {
+        result = await openMediaStream({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+      } catch {
+        result = await openMediaStream({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
       }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      streamRef.current = stream;
+      streamRef.current = result.stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        videoRef.current.srcObject = result.stream;
         await videoRef.current.play();
       }
       setActive(true);
@@ -62,7 +65,7 @@ function Scene() {
   };
 
   const stop = () => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    closeMediaStream(streamRef.current);
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     setActive(false);
