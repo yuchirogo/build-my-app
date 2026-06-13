@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { describeScene } from "@/lib/scene/describe.functions";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
-import { requestCameraPermission } from "@/lib/native/permissions";
+import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
 import { useSettings } from "@/hooks/use-settings";
 import { Camera, Sparkles, Loader2, AlertTriangle, CameraOff } from "lucide-react";
 import { toast } from "sonner";
