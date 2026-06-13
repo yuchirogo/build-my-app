@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { requestCameraPermission } from "@/lib/native/permissions";
+import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
@@ -37,24 +37,31 @@ export function CameraView() {
   const startCamera = async () => {
     setCamError(null);
     try {
-      // Xin quyền camera native trước (Capacitor) để popup Android hiện ra
-      const perm = await requestCameraPermission();
-      if (perm === "denied") {
-        setCamError("Vui lòng cấp quyền camera trong cài đặt để sử dụng tính năng này.");
-        return;
+      // Thử camera sau (mobile). Nếu không có (máy tính / webcam), fallback camera mặc định.
+      let result;
+      try {
+        result = await openMediaStream({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 60, min: 30 },
+          },
+          audio: false,
+        });
+      } catch {
+        result = await openMediaStream({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30 },
+          },
+          audio: false,
+        });
       }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 60, min: 30 },
-        },
-        audio: false,
-      });
-      streamRef.current = stream;
+      streamRef.current = result.stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        videoRef.current.srcObject = result.stream;
         await videoRef.current.play();
       }
       setActive(true);
@@ -64,7 +71,7 @@ export function CameraView() {
   };
 
   const stopCamera = () => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    closeMediaStream(streamRef.current);
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -255,7 +262,7 @@ export function CameraView() {
         {/* Danh sách detections (cho caregiver/low vision) */}
         {active && detections.length > 0 && (
           <div className="absolute left-3 top-3 max-w-[60%] space-y-1">
-            {detections.slice(0, 4).map((d, i) => (
+            {detections.slice(0, 3).map((d, i) => (
               <div
                 key={i}
                 className={cn(
