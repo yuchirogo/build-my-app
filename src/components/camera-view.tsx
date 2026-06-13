@@ -255,7 +255,7 @@ export function CameraView() {
         {/* Danh sách detections (cho caregiver/low vision) */}
         {active && detections.length > 0 && (
           <div className="absolute left-3 top-3 max-w-[60%] space-y-1">
-            {detections.slice(0, 4).map((d, i) => (
+            {detections.slice(0, 3).map((d, i) => (
               <div
                 key={i}
                 className={cn(
