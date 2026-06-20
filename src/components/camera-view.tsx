@@ -81,9 +81,10 @@ export function CameraView() {
     stopTts();
   };
 
-  // Tự động xin quyền & bật camera ngay khi vào trang để hộp thoại "Cho phép camera" hiện lập tức
+  // Yêu cầu thao tác chạm để bật camera — đồng thời mở khoá Web Speech (TTS) trên di động.
+  // KHÔNG auto-start: nếu auto-start thì chưa có user-gesture, Chrome Android sẽ chặn TTS
+  // → cảnh báo vật cản sẽ không phát ra tiếng.
   useEffect(() => {
-    startCamera();
     return () => stopCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
