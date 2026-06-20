@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
+import { unlockTTS } from "@/lib/tts/unlock";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
