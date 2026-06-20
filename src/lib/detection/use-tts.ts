@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { unlockTTS, isTtsUnlocked } from "@/lib/tts/unlock";
 
 interface SpeakOpts {
   rate?: number;
@@ -46,16 +47,27 @@ export function useVietnameseTTS() {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     if (!text) return;
     const synth = window.speechSynthesis;
+    // Đảm bảo engine đã mở khoá (Chrome Android / iOS Safari yêu cầu user gesture)
+    if (!isTtsUnlocked()) unlockTTS();
     // Một số trình duyệt (Chrome Android) pause engine khi idle — phải resume trước khi speak.
     try { synth.resume(); } catch {}
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "vi-VN";
-    u.rate = opts.rate ?? 1.05;
-    u.volume = opts.volume ?? 1;
-    const voice = pickVoice(synth.getVoices());
-    if (voice) u.voice = voice;
-    if (opts.priority) synth.cancel();
-    synth.speak(u);
+    const trySpeak = (attempt = 0) => {
+      const voices = synth.getVoices();
+      // Voices có thể chưa load lần đầu trên mobile — thử lại sau khi voiceschanged
+      if (voices.length === 0 && attempt < 3) {
+        setTimeout(() => trySpeak(attempt + 1), 200);
+        return;
+      }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "vi-VN";
+      u.rate = opts.rate ?? 1.05;
+      u.volume = opts.volume ?? 1;
+      const voice = pickVoice(voices);
+      if (voice) u.voice = voice;
+      if (opts.priority) synth.cancel();
+      synth.speak(u);
+    };
+    trySpeak();
   }, []);
 
   const speakThrottled = useCallback(

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
+import { unlockTTS } from "@/lib/tts/unlock";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
@@ -36,6 +37,8 @@ export function CameraView() {
 
   const startCamera = async () => {
     setCamError(null);
+    // Mở khoá Web Speech ngay trong user-gesture của lần chạm "Bật camera"
+    unlockTTS();
     try {
       // Thử camera sau (mobile). Nếu không có (máy tính / webcam), fallback camera mặc định.
       let result;
@@ -65,6 +68,8 @@ export function CameraView() {
         await videoRef.current.play();
       }
       setActive(true);
+      // Phát một câu xác nhận ngắn để chứng minh TTS đã hoạt động trên thiết bị
+      speak("Đã bật camera, bắt đầu nhận diện vật thể", { priority: true });
     } catch (e: any) {
       setCamError(e?.message ?? "Không truy cập được camera");
     }
@@ -81,9 +86,10 @@ export function CameraView() {
     stopTts();
   };
 
-  // Tự động xin quyền & bật camera ngay khi vào trang để hộp thoại "Cho phép camera" hiện lập tức
+  // Yêu cầu thao tác chạm để bật camera — đồng thời mở khoá Web Speech (TTS) trên di động.
+  // KHÔNG auto-start: nếu auto-start thì chưa có user-gesture, Chrome Android sẽ chặn TTS
+  // → cảnh báo vật cản sẽ không phát ra tiếng.
   useEffect(() => {
-    startCamera();
     return () => stopCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
