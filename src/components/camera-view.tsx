@@ -68,6 +68,8 @@ export function CameraView() {
         await videoRef.current.play();
       }
       setActive(true);
+      // Phát một câu xác nhận ngắn để chứng minh TTS đã hoạt động trên thiết bị
+      speak("Đã bật camera, bắt đầu nhận diện vật thể", { priority: true });
     } catch (e: any) {
       setCamError(e?.message ?? "Không truy cập được camera");
     }
