@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { unlockTTS, isTtsUnlocked } from "@/lib/tts/unlock";
 
 interface SpeakOpts {
   rate?: number;
