@@ -37,6 +37,8 @@ export function CameraView() {
 
   const startCamera = async () => {
     setCamError(null);
+    // Mở khoá Web Speech ngay trong user-gesture của lần chạm "Bật camera"
+    unlockTTS();
     try {
       // Thử camera sau (mobile). Nếu không có (máy tính / webcam), fallback camera mặc định.
       let result;
