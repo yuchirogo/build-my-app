@@ -116,10 +116,11 @@ function Scene() {
           </div>
         )}
         {error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-secondary" aria-hidden />
-            <p>{error}</p>
-          </div>
+          <CameraPermissionHelp
+            error={error}
+            onRetry={start}
+            onReload={() => window.location.reload()}
+          />
         )}
 
         {description && (
@@ -131,9 +132,10 @@ function Scene() {
 
       <div className="space-y-3 bg-black/90 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {!active ? (
-          <Button onClick={start} size="lg" className="h-16 w-full text-base font-semibold">
-            <Camera className="h-6 w-6" /> Bật camera
+          <Button onClick={start} disabled={starting} size="lg" className="h-16 w-full text-base font-semibold" aria-label="Bật camera để mô tả cảnh">
+            {starting ? <><Loader2 className="h-6 w-6 animate-spin" /> Đang xin quyền camera…</> : <><Camera className="h-6 w-6" /> Bật camera</>}
           </Button>
+
         ) : (
           <div className="flex gap-2">
             <Button
