@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
+import { closeMediaStream } from "@/lib/native/media-capture";
+import { acquireCamera, type CameraError } from "@/lib/native/camera-flow";
+import { CameraPermissionHelp } from "@/components/camera-permission-help";
 import { unlockTTS } from "@/lib/tts/unlock";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
 import { HIGH_PRIORITY, toVietnamese } from "@/lib/detection/labels-vi";
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, ScanLine, Volume2, VolumeX, Loader2, AlertTriangle } from "lucide-react";
+import { Camera, CameraOff, ScanLine, Volume2, VolumeX, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 type Mode = "realtime" | "ondemand";
 
