@@ -5,10 +5,13 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { describeScene } from "@/lib/scene/describe.functions";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
-import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
+import { closeMediaStream } from "@/lib/native/media-capture";
+import { acquireCamera, type CameraError } from "@/lib/native/camera-flow";
+import { CameraPermissionHelp } from "@/components/camera-permission-help";
 import { useSettings } from "@/hooks/use-settings";
-import { Camera, Sparkles, Loader2, AlertTriangle, CameraOff } from "lucide-react";
+import { Camera, Sparkles, Loader2, CameraOff } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/scene-description")({
   component: () => (
@@ -30,7 +33,8 @@ function Scene() {
   const streamRef = useRef<MediaStream | null>(null);
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<CameraError | null>(null);
+  const [starting, setStarting] = useState(false);
   const [description, setDescription] = useState<string>("");
   const describe = useServerFn(describeScene);
   const { speak } = useVietnameseTTS();
@@ -40,29 +44,24 @@ function Scene() {
 
   const start = async () => {
     setError(null);
+    setStarting(true);
     try {
-      let result;
-      try {
-        result = await openMediaStream({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false,
-        });
-      } catch {
-        result = await openMediaStream({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false,
-        });
+      const res = await acquireCamera();
+      if ("error" in res) {
+        setError(res.error);
+        return;
       }
-      streamRef.current = result.stream;
+      streamRef.current = res.stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = result.stream;
-        await videoRef.current.play();
+        videoRef.current.srcObject = res.stream;
+        try { await videoRef.current.play(); } catch { /* iOS */ }
       }
       setActive(true);
-    } catch (e: any) {
-      setError(e?.message ?? "Không truy cập được camera");
+    } finally {
+      setStarting(false);
     }
   };
+
 
   const stop = () => {
     closeMediaStream(streamRef.current);
@@ -117,10 +116,11 @@ function Scene() {
           </div>
         )}
         {error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-secondary" aria-hidden />
-            <p>{error}</p>
-          </div>
+          <CameraPermissionHelp
+            error={error}
+            onRetry={start}
+            onReload={() => window.location.reload()}
+          />
         )}
 
         {description && (
@@ -132,9 +132,10 @@ function Scene() {
 
       <div className="space-y-3 bg-black/90 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {!active ? (
-          <Button onClick={start} size="lg" className="h-16 w-full text-base font-semibold">
-            <Camera className="h-6 w-6" /> Bật camera
+          <Button onClick={start} disabled={starting} size="lg" className="h-16 w-full text-base font-semibold" aria-label="Bật camera để mô tả cảnh">
+            {starting ? <><Loader2 className="h-6 w-6 animate-spin" /> Đang xin quyền camera…</> : <><Camera className="h-6 w-6" /> Bật camera</>}
           </Button>
+
         ) : (
           <div className="flex gap-2">
             <Button

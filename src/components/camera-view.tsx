@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { openMediaStream, closeMediaStream } from "@/lib/native/media-capture";
+import { closeMediaStream } from "@/lib/native/media-capture";
+import { acquireCamera, type CameraError } from "@/lib/native/camera-flow";
+import { CameraPermissionHelp } from "@/components/camera-permission-help";
 import { unlockTTS } from "@/lib/tts/unlock";
 import { useDetector, estimateDistance, Detection } from "@/lib/detection/use-detector";
 import { useVietnameseTTS } from "@/lib/detection/use-tts";
 import { useCane } from "@/hooks/use-cane";
 import { HIGH_PRIORITY, toVietnamese } from "@/lib/detection/labels-vi";
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, ScanLine, Volume2, VolumeX, Loader2, AlertTriangle } from "lucide-react";
+import { Camera, CameraOff, ScanLine, Volume2, VolumeX, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 type Mode = "realtime" | "ondemand";
 
@@ -20,7 +23,8 @@ export function CameraView() {
   const [active, setActive] = useState(false);
   const [mode, setMode] = useState<Mode>("realtime");
   const [muted, setMuted] = useState(false);
-  const [camError, setCamError] = useState<string | null>(null);
+  const [camError, setCamError] = useState<CameraError | null>(null);
+  const [starting, setStarting] = useState(false);
   const [detections, setDetections] = useState<Detection[]>([]);
   const [fps, setFps] = useState(0);
 
@@ -37,41 +41,28 @@ export function CameraView() {
 
   const startCamera = async () => {
     setCamError(null);
+    setStarting(true);
     // Mở khoá Web Speech ngay trong user-gesture của lần chạm "Bật camera"
     unlockTTS();
     try {
-      // Thử camera sau (mobile). Nếu không có (máy tính / webcam), fallback camera mặc định.
-      let result;
-      try {
-        result = await openMediaStream({
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 60, min: 30 },
-          },
-          audio: false,
-        });
-      } catch {
-        result = await openMediaStream({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 30 },
-          },
-          audio: false,
-        });
+      const res = await acquireCamera();
+      if ("error" in res) {
+        setCamError(res.error);
+        return;
       }
-      streamRef.current = result.stream;
+      streamRef.current = res.stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = result.stream;
-        await videoRef.current.play();
+        videoRef.current.srcObject = res.stream;
+        try {
+          await videoRef.current.play();
+        } catch {
+          /* iOS đôi khi cần user-gesture khác — bỏ qua, khung hình vẫn cập nhật */
+        }
       }
       setActive(true);
-      // Phát một câu xác nhận ngắn để chứng minh TTS đã hoạt động trên thiết bị
       speak("Đã bật camera, bắt đầu nhận diện vật thể", { priority: true });
-    } catch (e: any) {
-      setCamError(e?.message ?? "Không truy cập được camera");
+    } finally {
+      setStarting(false);
     }
   };
 
@@ -85,6 +76,7 @@ export function CameraView() {
     setDetections([]);
     stopTts();
   };
+
 
   // Yêu cầu thao tác chạm để bật camera — đồng thời mở khoá Web Speech (TTS) trên di động.
   // KHÔNG auto-start: nếu auto-start thì chưa có user-gesture, Chrome Android sẽ chặn TTS
@@ -257,13 +249,14 @@ export function CameraView() {
           </div>
         )}
 
-        {false && camError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-secondary" aria-hidden />
-            <p className="text-base">{camError}</p>
-            <p className="text-sm text-white/70">Vui lòng cấp quyền camera trong cài đặt trình duyệt.</p>
-          </div>
+        {camError && (
+          <CameraPermissionHelp
+            error={camError}
+            onRetry={startCamera}
+            onReload={() => window.location.reload()}
+          />
         )}
+
 
         {/* Danh sách detections (cho caregiver/low vision) */}
         {active && detections.length > 0 && (
@@ -300,10 +293,16 @@ export function CameraView() {
               onClick={startCamera}
               size="lg"
               className="h-16 flex-1 text-base font-semibold"
-              disabled={!modelReady}
+              disabled={!modelReady || starting}
+              aria-label="Bật camera và bắt đầu nhận diện"
             >
-              <Camera className="h-6 w-6" /> Bật camera
+              {starting ? (
+                <><Loader2 className="h-6 w-6 animate-spin" /> Đang xin quyền camera…</>
+              ) : (
+                <><Camera className="h-6 w-6" /> Bật camera</>
+              )}
             </Button>
+
           ) : mode === "ondemand" ? (
             <Button
               onClick={onDemand}
