@@ -33,7 +33,8 @@ function Scene() {
   const streamRef = useRef<MediaStream | null>(null);
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<CameraError | null>(null);
+  const [starting, setStarting] = useState(false);
   const [description, setDescription] = useState<string>("");
   const describe = useServerFn(describeScene);
   const { speak } = useVietnameseTTS();
@@ -43,29 +44,24 @@ function Scene() {
 
   const start = async () => {
     setError(null);
+    setStarting(true);
     try {
-      let result;
-      try {
-        result = await openMediaStream({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false,
-        });
-      } catch {
-        result = await openMediaStream({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false,
-        });
+      const res = await acquireCamera();
+      if ("error" in res) {
+        setError(res.error);
+        return;
       }
-      streamRef.current = result.stream;
+      streamRef.current = res.stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = result.stream;
-        await videoRef.current.play();
+        videoRef.current.srcObject = res.stream;
+        try { await videoRef.current.play(); } catch { /* iOS */ }
       }
       setActive(true);
-    } catch (e: any) {
-      setError(e?.message ?? "Không truy cập được camera");
+    } finally {
+      setStarting(false);
     }
   };
+
 
   const stop = () => {
     closeMediaStream(streamRef.current);
