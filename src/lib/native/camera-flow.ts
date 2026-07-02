@@ -2,9 +2,9 @@
 // Trả về stream khi thành công, hoặc một đối tượng lỗi có phân loại + hướng dẫn tiếng Việt
 // theo từng nền tảng (iOS Safari / Android Chrome / Android APK / desktop).
 
-import { Capacitor } from "@capacitor/core";
 import { openMediaStream, type OpenOptions } from "./media-capture";
 import { isNative } from "./permissions";
+
 
 export type CameraErrorKind =
   | "insecure-context"
