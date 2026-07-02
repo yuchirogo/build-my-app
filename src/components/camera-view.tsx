@@ -293,10 +293,16 @@ export function CameraView() {
               onClick={startCamera}
               size="lg"
               className="h-16 flex-1 text-base font-semibold"
-              disabled={!modelReady}
+              disabled={!modelReady || starting}
+              aria-label="Bật camera và bắt đầu nhận diện"
             >
-              <Camera className="h-6 w-6" /> Bật camera
+              {starting ? (
+                <><Loader2 className="h-6 w-6 animate-spin" /> Đang xin quyền camera…</>
+              ) : (
+                <><Camera className="h-6 w-6" /> Bật camera</>
+              )}
             </Button>
+
           ) : mode === "ondemand" ? (
             <Button
               onClick={onDemand}
