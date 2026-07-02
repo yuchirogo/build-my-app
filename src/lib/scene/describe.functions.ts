@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 interface Input {
   imageBase64: string; // data URL hoặc base64 thuần
 }
 
+// Ứng dụng cho phép khách dùng (không đăng nhập). Endpoint AI vẫn được bảo vệ
+// bằng LOVABLE_API_KEY phía server; kích thước ảnh bị giới hạn ở inputValidator.
 export const describeScene = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data: Input) => {
     if (!data?.imageBase64 || typeof data.imageBase64 !== "string") {
       throw new Error("imageBase64 is required");

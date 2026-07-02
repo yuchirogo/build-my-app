@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>BlindGuard AI · Ngoại tuyến</title>
+<meta name="theme-color" content="#0F172A" />
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #0F172A;
+    color: #F8FAFC;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; text-align: center;
+  }
+  .card { max-width: 480px; }
+  h1 { font-size: 28px; margin: 16px 0 8px; }
+  p  { font-size: 18px; line-height: 1.6; opacity: .85; }
+  button {
+    margin-top: 24px; padding: 14px 22px; border-radius: 14px;
+    background: #1E3A8A; color: white; border: 0; font-size: 18px; font-weight: 600;
+  }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: #F59E0B; display: inline-block; margin-right: 6px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <p><span class="dot" aria-hidden="true"></span>Ngoại tuyến</p>
+    <h1>Bạn đang không có mạng</h1>
+    <p>BlindGuard AI vẫn có thể chạy nhận diện vật thể ngay trên thiết bị. Các tính năng cần mạng (mô tả cảnh AI, đồng bộ) sẽ hoạt động lại khi có kết nối.</p>
+    <button onclick="location.reload()">Thử lại</button>
+  </div>
+</body>
+</html>
