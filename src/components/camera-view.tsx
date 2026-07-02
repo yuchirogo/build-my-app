@@ -249,13 +249,14 @@ export function CameraView() {
           </div>
         )}
 
-        {false && camError && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-secondary" aria-hidden />
-            <p className="text-base">{camError}</p>
-            <p className="text-sm text-white/70">Vui lòng cấp quyền camera trong cài đặt trình duyệt.</p>
-          </div>
+        {camError && (
+          <CameraPermissionHelp
+            error={camError}
+            onRetry={startCamera}
+            onReload={() => window.location.reload()}
+          />
         )}
+
 
         {/* Danh sách detections (cho caregiver/low vision) */}
         {active && detections.length > 0 && (
