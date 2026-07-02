@@ -245,8 +245,9 @@ export async function acquireCamera(): Promise<CameraSuccess | { error: CameraEr
 export async function openAppSettings(): Promise<boolean> {
   if (!isNative()) return false;
   try {
-    // Ưu tiên plugin capacitor-native-settings nếu đã cài
-    const mod: any = await import(/* @vite-ignore */ "capacitor-native-settings").catch(() => null);
+    // Ưu tiên plugin capacitor-native-settings nếu đã cài trong APK
+    const pkg = "capacitor-native-settings";
+    const mod: any = await import(/* @vite-ignore */ pkg).catch(() => null);
     if (mod?.NativeSettings?.openAndroid) {
       await mod.NativeSettings.openAndroid({ option: "application_details" });
       return true;
@@ -255,13 +256,10 @@ export async function openAppSettings(): Promise<boolean> {
       await mod.NativeSettings.openIOS({ option: "app" });
       return true;
     }
-    // Fallback: dùng App plugin nếu có
-    const appMod: any = await import("@capacitor/app").catch(() => null);
-    if (appMod?.App?.exitApp && Capacitor.getPlatform() === "android") {
-      // Không có API mở Settings — đành thôi
-    }
   } catch (e) {
     console.warn("openAppSettings", e);
   }
+  // Không có plugin → người dùng cần vào Cài đặt thủ công theo hướng dẫn
   return false;
 }
+
